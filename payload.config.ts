@@ -1,5 +1,5 @@
 import { buildConfig } from "payload";
-import { sqliteAdapter } from "@payloadcms/db-sqlite";
+import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -43,7 +43,11 @@ export default buildConfig({
   editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET || "dev-only-change-me",
   typescript: { outputFile: path.resolve(__dirname, "payload-types.ts") },
-  db: sqliteAdapter({ client: { url: process.env.DATABASE_URL || "file:./data/news.db" } }),
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URL || "postgresql://news:news@localhost:5432/news_db"
+    }
+  }),
   sharp,
   localization: {
     locales: [

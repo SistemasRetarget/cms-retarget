@@ -3,8 +3,8 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-puebloladehesa}
-      POSTGRES_USER: ${POSTGRES_USER:-pld}
+      POSTGRES_DB: ${POSTGRES_DB:-news_db}
+      POSTGRES_USER: ${POSTGRES_USER:-news}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -23,7 +23,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URI: postgresql://${POSTGRES_USER:-pld}:${POSTGRES_PASSWORD:-changeme}@db:5432/${POSTGRES_DB:-puebloladehesa}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-news}:${POSTGRES_PASSWORD:-changeme}@db:5432/${POSTGRES_DB:-news_db}
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}

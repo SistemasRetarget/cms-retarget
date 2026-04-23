@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { generateLandingPage, resolveConfig, type LandingBrief } from "@/lib/ai/landing";
+import { generateLandingPageSchema } from "@/lib/schemas";
+import { createRequestLogger } from "@/lib/logger";
+import { rateLimit } from "@/lib/rateLimit";
 
 function slugify(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -9,53 +12,69 @@ function slugify(s: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  const payload = await getPayload({ config });
+  const requestId = req.headers.get("x-request-id") || "unknown";
+  const log = createRequestLogger(requestId);
 
-  // Auth: solo admin
-  const { user } = await payload.auth({ headers: req.headers });
-  if (!user || (user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
-
-  let brief: LandingBrief;
   try {
-    brief = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Body JSON inválido" }, { status: 400 });
-  }
+    const payload = await getPayload({ config });
 
-  if (!brief.topic || !brief.audience || !brief.goal) {
-    return NextResponse.json(
-      { error: "Se requieren: topic, audience, goal" },
-      { status: 400 }
-    );
-  }
+    // Auth: solo admin
+    const { user } = await payload.auth({ headers: req.headers });
+    if (!user || (user as { role?: string }).role !== "admin") {
+      log.warn("Unauthorized landing page generation attempt");
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
-  // Obtener config AI
-  const settings = await payload.findGlobal({ slug: "ai-settings" }) as Record<string, unknown>;
-  const aiCfg = resolveConfig(settings as Parameters<typeof resolveConfig>[0]);
-  if (!aiCfg.apiKey) {
-    return NextResponse.json(
-      { error: `Falta API key para ${aiCfg.provider}. Configúrala en Admin → AI Settings.` },
-      { status: 400 }
-    );
-  }
+    // Rate limit: 10 requests per minute (AI generation is expensive)
+    const rateLimitKey = `landing-gen:${user.id}`;
+    const rateLimitResult = await rateLimit(rateLimitKey, 10, 60_000);
+    if (!rateLimitResult.ok) {
+      log.warn({ userId: user.id }, "Rate limit exceeded for landing page generation");
+      return NextResponse.json(
+        { error: "Too many requests, please try again later" },
+        { status: 429, headers: { "Retry-After": "60" } }
+      );
+    }
 
-  // Generar con IA
-  let generated;
-  try {
-    generated = await generateLandingPage(aiCfg, brief);
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
-  }
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      log.warn("Invalid JSON in landing page generation request");
+      return NextResponse.json({ error: "Body JSON inválido" }, { status: 400 });
+    }
 
-  // Deduplicar slug
-  const baseSlug = slugify(generated.slug || brief.topic);
-  const suffix = "-" + Date.now().toString(36).slice(-4);
-  const slug = baseSlug + suffix;
+    const validation = generateLandingPageSchema.safeParse(body);
+    if (!validation.success) {
+      const errors = validation.error.flatten();
+      log.warn({ errors }, "Validation failed for landing page generation");
+      return NextResponse.json({ error: "Invalid request", details: errors }, { status: 400 });
+    }
 
-  // Guardar en Payload
-  try {
+    const brief = validation.data as LandingBrief;
+    log.info({ topic: brief.topic, tone: brief.tone }, "Generating landing page");
+
+    // Obtener config AI
+    const settings = await payload.findGlobal({ slug: "ai-settings" }) as Record<string, unknown>;
+    const aiCfg = resolveConfig(settings as Parameters<typeof resolveConfig>[0]);
+    if (!aiCfg.apiKey) {
+      log.error({ provider: aiCfg.provider }, "Missing AI provider API key for landing page generation");
+      return NextResponse.json(
+        { error: `Falta API key para ${aiCfg.provider}. Configúrala en Admin → AI Settings.` },
+        { status: 400 }
+      );
+    }
+
+    // Generar con IA
+    log.info({ provider: aiCfg.provider }, "Calling AI provider for landing page generation");
+    const generated = await generateLandingPage(aiCfg, brief);
+
+    // Deduplicar slug
+    const baseSlug = slugify(generated.slug || brief.topic);
+    const suffix = "-" + Date.now().toString(36).slice(-4);
+    const slug = baseSlug + suffix;
+
+    // Guardar en Payload
     const landing = await payload.create({
       collection: "landing-pages",
       data: {
@@ -71,6 +90,8 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    log.info({ id: landing.id, slug, sectionsCount: generated.sections.length }, "Landing page created successfully");
+
     return NextResponse.json({
       success: true,
       id: landing.id,
@@ -83,6 +104,7 @@ export async function POST(req: NextRequest) {
       previewUrl: `/landing/${slug}`
     });
   } catch (e) {
-    return NextResponse.json({ error: `Error al guardar: ${(e as Error).message}` }, { status: 500 });
+    log.error({ error: (e as Error).message }, "Failed to generate landing page");
+    return NextResponse.json({ error: `Error: ${(e as Error).message}` }, { status: 500 });
   }
 }
