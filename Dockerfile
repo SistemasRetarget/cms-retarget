@@ -2,7 +2,7 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Build tools para compilar módulos nativos (better-sqlite3, sharp)
+# Build tools para compilar módulos nativos (sharp, pg)
 RUN apk add --no-cache python3 make g++ libc6-compat
 
 # Dependencias (todas: devDeps son necesarias para next build)
