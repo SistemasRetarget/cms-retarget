@@ -3,6 +3,7 @@
  * temporal y detecta temas recurrentes usando el proveedor AI activo.
  */
 import type { AIConfig } from "@/lib/ai/providers";
+import { getBreaker } from "@/lib/circuitBreaker";
 
 export interface TrendArticleInput {
   id: string | number;
@@ -155,13 +156,15 @@ export async function analyzeTrends(
   }
 
   const prompt = buildPrompt(articles, window);
-  let text: string;
-  switch (cfg.provider) {
-    case "anthropic": text = await callAnthropic(cfg, prompt); break;
-    case "gemini": text = await callGemini(cfg, prompt); break;
-    case "openai": text = await callOpenAI(cfg, prompt); break;
-    default: throw new Error(`Proveedor desconocido: ${cfg.provider}`);
-  }
+  const breaker = getBreaker(`llm:${cfg.provider}`);
+  const text = await breaker.execute(async () => {
+    switch (cfg.provider) {
+      case "anthropic": return callAnthropic(cfg, prompt);
+      case "gemini": return callGemini(cfg, prompt);
+      case "openai": return callOpenAI(cfg, prompt);
+      default: throw new Error(`Proveedor desconocido: ${cfg.provider}`);
+    }
+  });
 
   const { trends } = extractJSON(text);
 

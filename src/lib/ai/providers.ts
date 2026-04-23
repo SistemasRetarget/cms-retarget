@@ -3,6 +3,8 @@
  * Las credenciales vienen del global `ai-settings` (se pasan en runtime).
  */
 
+import { getBreaker } from "@/lib/circuitBreaker";
+
 export type Provider = "anthropic" | "gemini" | "openai";
 
 export interface AIConfig {
@@ -124,12 +126,15 @@ async function callOpenAI(cfg: AIConfig, source: SourceInput): Promise<Generated
 
 export async function generateArticle(cfg: AIConfig, source: SourceInput): Promise<GeneratedArticle> {
   if (!cfg.apiKey) throw new Error(`Falta API key para ${cfg.provider}. Configúrala en Admin → AI Settings.`);
-  switch (cfg.provider) {
-    case "anthropic": return callAnthropic(cfg, source);
-    case "gemini": return callGemini(cfg, source);
-    case "openai": return callOpenAI(cfg, source);
-    default: throw new Error(`Proveedor desconocido: ${cfg.provider}`);
-  }
+  const breaker = getBreaker(`llm:${cfg.provider}`);
+  return breaker.execute(() => {
+    switch (cfg.provider) {
+      case "anthropic": return callAnthropic(cfg, source);
+      case "gemini": return callGemini(cfg, source);
+      case "openai": return callOpenAI(cfg, source);
+      default: throw new Error(`Proveedor desconocido: ${cfg.provider}`);
+    }
+  });
 }
 
 export function resolveConfig(settings: {

@@ -3,11 +3,7 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { collect, type SourceType } from "@/lib/collectors";
 import { generateArticle, resolveConfig } from "@/lib/ai/providers";
-
-function slugify(s: string): string {
-  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
-}
+import { uniqueSlug } from "@/lib/slug";
 
 function lexicalFromText(body: string) {
   const paragraphs = body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
@@ -116,7 +112,7 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
-        const slug = slugify(generated.title) + "-" + Date.now().toString(36).slice(-4);
+        const slug = uniqueSlug(generated.title);
         const autoPublish = Boolean((settings as { autoPublish?: boolean }).autoPublish);
 
         try {

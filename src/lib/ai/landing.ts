@@ -4,6 +4,7 @@
  */
 
 import { generateArticle, resolveConfig, type AIConfig } from "./providers";
+import { getBreaker } from "@/lib/circuitBreaker";
 
 export interface LandingBrief {
   topic: string;          // ej: "Software de inventario para PyMEs"
@@ -208,10 +209,8 @@ export async function generateLandingPage(
   if (!cfg.apiKey) throw new Error(`Falta API key para ${cfg.provider}. Configúrala en Admin → AI Settings.`);
 
   const prompt = buildLandingPrompt(brief);
-
-  // Reutilizamos generateArticle pasando el prompt como contenido
-  // pero necesitamos una llamada más directa para controlar el output
-  const result = await callProviderDirect(cfg, prompt);
+  const breaker = getBreaker(`llm:${cfg.provider}`);
+  const result = await breaker.execute(() => callProviderDirect(cfg, prompt));
   return extractLandingJSON(result);
 }
 

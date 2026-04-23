@@ -5,11 +5,7 @@ import { generateLandingPage, resolveConfig, type LandingBrief } from "@/lib/ai/
 import { generateLandingPageSchema } from "@/lib/schemas";
 import { createRequestLogger } from "@/lib/logger";
 import { rateLimit } from "@/lib/rateLimit";
-
-function slugify(s: string): string {
-  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
-}
+import { uniqueSlug } from "@/lib/slug";
 
 export async function POST(req: NextRequest) {
   const requestId = req.headers.get("x-request-id") || "unknown";
@@ -70,9 +66,7 @@ export async function POST(req: NextRequest) {
     const generated = await generateLandingPage(aiCfg, brief);
 
     // Deduplicar slug
-    const baseSlug = slugify(generated.slug || brief.topic);
-    const suffix = "-" + Date.now().toString(36).slice(-4);
-    const slug = baseSlug + suffix;
+    const slug = uniqueSlug(generated.slug || brief.topic);
 
     // Guardar en Payload
     const landing = await payload.create({
