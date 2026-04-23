@@ -1,0 +1,403 @@
+/* ═══════════════════════════════════════════════════════════════
+   Pueblo La Dehesa CMS — tema personalizado (Payload 3)
+   Paleta cálida + alto contraste + UX moderna
+   ═══════════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="light"] {
+  /* Marca */
+  --brand-bg: #faf8f5;
+  --brand-ink: #1a1a1a;
+  --brand-accent: #8b7355;
+  --brand-accent-dark: #6b5842;
+  --brand-accent-light: #a88c6b;
+  --brand-soft: #ede7dd;
+  --brand-success: #4a7c3a;
+  --brand-danger: #c0392b;
+
+  /* Payload overrides — fondos y texto con más contraste */
+  --theme-bg: #f6f2ec;
+  --theme-input-bg: #ffffff;
+  --theme-elevation-0: #ffffff;
+  --theme-elevation-50: #faf8f5;
+  --theme-elevation-100: #f0eadf;
+  --theme-elevation-150: #ede7dd;
+  --theme-elevation-200: #e0d8cb;
+  --theme-elevation-400: #a88c6b;
+  --theme-elevation-600: #6b5842;
+  --theme-elevation-800: #2c2419;
+  --theme-elevation-1000: #1a1a1a;
+
+  --theme-text: #1a1a1a;
+  --theme-text-dark: #0d0d0d;
+
+  --color-base-0: #ffffff;
+  --color-base-50: #faf8f5;
+  --color-base-100: #ede7dd;
+  --color-base-500: #8b7355;
+  --color-base-800: #2c2419;
+  --color-base-1000: #1a1a1a;
+
+  /* Success/error con más punch */
+  --color-success-500: #4a7c3a;
+  --color-error-500: #c0392b;
+
+  /* Radios y sombras suaves */
+  --style-radius-s: 6px;
+  --style-radius-m: 10px;
+  --style-radius-l: 14px;
+}
+
+[data-theme="dark"] {
+  --theme-bg: #17140f;
+  --theme-elevation-0: #1e1a14;
+  --theme-elevation-50: #221e17;
+  --theme-elevation-100: #2a241c;
+  --theme-elevation-150: #322b21;
+  --theme-elevation-200: #3d3427;
+  --theme-text: #f5efe5;
+  --brand-accent: #c9a877;
+}
+
+/* ── TIPOGRAFÍA GLOBAL ────────────────────────────────────────── */
+body,
+.payload-default-theme {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  letter-spacing: -0.005em;
+}
+
+h1, h2, h3, .nav__label {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.01em;
+}
+
+/* ── LOGIN — contraste fuerte, card elevada, botón prominente ── */
+.template-minimal,
+.login {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(139, 115, 85, 0.12), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(74, 124, 58, 0.08), transparent 50%),
+    linear-gradient(135deg, #2c2419 0%, #1a1a1a 100%);
+  min-height: 100vh;
+}
+
+.login__wrap,
+.template-minimal .template-minimal__wrap {
+  background: #ffffff;
+  padding: 3rem 2.5rem;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px -10px rgba(0, 0, 0, 0.5),
+    0 8px 20px -8px rgba(139, 115, 85, 0.3);
+  max-width: 440px;
+  width: 100%;
+  border-top: 4px solid var(--brand-accent);
+}
+
+.login__brand,
+.login h1 {
+  color: var(--brand-ink) !important;
+  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+
+.login p,
+.login__wrap > p {
+  color: #555 !important;
+  margin-bottom: 1.8rem;
+  font-size: 0.95rem;
+}
+
+.login label,
+.login .field-label {
+  color: #2c2419 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.4rem;
+}
+
+.login input[type="text"],
+.login input[type="email"],
+.login input[type="password"],
+.login .field-type input {
+  background: #faf8f5 !important;
+  border: 2px solid #ddd2c0 !important;
+  color: #1a1a1a !important;
+  padding: 0.85rem 1rem !important;
+  border-radius: 8px !important;
+  font-size: 1rem !important;
+  transition: all 0.15s ease !important;
+}
+
+.login input:focus {
+  border-color: var(--brand-accent) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.15) !important;
+  outline: none !important;
+}
+
+/* Botón SUBMIT bien visible con buen contraste */
+.login button[type="submit"],
+.login .btn--style-primary,
+.login .form-submit button {
+  background: var(--brand-accent) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 0.95rem 1.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s ease !important;
+  box-shadow: 0 4px 12px -2px rgba(139, 115, 85, 0.4);
+  margin-top: 0.5rem;
+}
+
+.login button[type="submit"]:hover,
+.login .btn--style-primary:hover {
+  background: var(--brand-accent-dark) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -2px rgba(139, 115, 85, 0.5) !important;
+}
+
+.login a {
+  color: var(--brand-accent) !important;
+  font-weight: 500;
+}
+
+/* ── NAV LATERAL — look cálido y legible ───────────────────── */
+.nav {
+  background: #2c2419 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav__wrap {
+  padding-top: 1rem;
+}
+
+.nav__link,
+.nav__link:link {
+  color: #d5c9b5 !important;
+  padding: 0.7rem 1rem !important;
+  border-radius: 6px;
+  margin: 0.15rem 0.5rem;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.nav__link:hover {
+  background: rgba(201, 168, 119, 0.12) !important;
+  color: #ffffff !important;
+}
+
+.nav__link.active,
+.nav__link--active {
+  background: var(--brand-accent) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.nav-group__label,
+.nav__label {
+  color: #9a8a72 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 1.2rem 0.4rem !important;
+}
+
+/* ── BOTONES GLOBAL ──────────────────────────────────────────── */
+.btn--style-primary {
+  background: var(--brand-accent) !important;
+  border-color: var(--brand-accent) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  transition: all 0.15s ease !important;
+}
+
+.btn--style-primary:hover {
+  background: var(--brand-accent-dark) !important;
+  border-color: var(--brand-accent-dark) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(139, 115, 85, 0.35);
+}
+
+.btn--style-secondary {
+  background: #ffffff !important;
+  border: 2px solid var(--brand-accent) !important;
+  color: var(--brand-accent-dark) !important;
+  font-weight: 600 !important;
+}
+
+/* ── CARDS / LISTADOS ────────────────────────────────────────── */
+.card,
+.collection-list,
+.dashboard__group {
+  background: #ffffff;
+  border: 1px solid #e8dfd0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(44, 36, 25, 0.04);
+  transition: all 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px -4px rgba(44, 36, 25, 0.12);
+  transform: translateY(-2px);
+  border-color: var(--brand-accent-light);
+}
+
+/* ── TABLAS ──────────────────────────────────────────────────── */
+.table thead th {
+  background: #f5efe5 !important;
+  color: #2c2419 !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.9rem 1rem !important;
+}
+
+.table tbody tr:hover {
+  background: #faf6ee !important;
+}
+
+/* ── DASHBOARD HEADER ────────────────────────────────────────── */
+.dashboard {
+  padding: 2rem 2.5rem !important;
+}
+
+.dashboard__label {
+  font-family: Georgia, serif;
+  font-size: 2rem !important;
+  color: #1a1a1a !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 700;
+}
+
+.dashboard__group-title {
+  font-family: Georgia, serif;
+  font-size: 1.2rem !important;
+  color: var(--brand-accent-dark) !important;
+  border-bottom: 2px solid var(--brand-soft);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem !important;
+}
+
+/* ── INPUTS GLOBALES ─────────────────────────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea,
+.field-type input,
+.field-type textarea {
+  border: 1.5px solid #d8cdb8 !important;
+  border-radius: 7px !important;
+  transition: all 0.15s ease !important;
+  background: #ffffff !important;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--brand-accent) !important;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.12) !important;
+  outline: none !important;
+}
+
+/* ── STATUS PILLS ────────────────────────────────────────────── */
+.pill--style-success {
+  background: #e6f0df !important;
+  color: #2d5320 !important;
+  font-weight: 600;
+}
+
+/* ── BANNER personalizado dashboard ──────────────────────────── */
+.pld-welcome {
+  background: linear-gradient(135deg, #2c2419 0%, #4a3d2c 100%);
+  color: #f5efe5;
+  padding: 2rem 2.5rem;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px -8px rgba(44, 36, 25, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.pld-welcome::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(201, 168, 119, 0.2), transparent 70%);
+  pointer-events: none;
+}
+
+.pld-welcome h2 {
+  font-family: Georgia, serif;
+  font-size: 1.9rem;
+  margin: 0 0 0.5rem;
+  color: #ffffff;
+  position: relative;
+}
+
+.pld-welcome p {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 1rem;
+  position: relative;
+  max-width: 600px;
+}
+
+.pld-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.pld-shortcut {
+  background: #ffffff;
+  border: 1px solid #e8dfd0;
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: #2c2419;
+  transition: all 0.15s ease;
+  display: block;
+  border-left: 4px solid var(--brand-accent);
+}
+
+.pld-shortcut:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -8px rgba(44, 36, 25, 0.15);
+  border-left-color: var(--brand-accent-dark);
+  color: #1a1a1a;
+}
+
+.pld-shortcut__icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.pld-shortcut__title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  font-family: Georgia, serif;
+}
+
+.pld-shortcut__desc {
+  font-size: 0.85rem;
+  color: #6b5842;
+  margin: 0;
+}
