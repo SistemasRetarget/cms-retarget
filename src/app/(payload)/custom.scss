@@ -401,3 +401,283 @@ textarea:focus {
   color: #6b5842;
   margin: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTRASTE GLOBAL — evita texto claro sobre fondo claro
+   Esta sección actúa como "red de seguridad" para todas las
+   pantallas admin que no tienen estilos específicos arriba
+   (create-first-user, forgot-password, reset-password, unlock,
+   verify, 404, etc.).
+   Regla: si el fondo es claro, el texto es oscuro — y viceversa.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* --- Tema CLARO: forzar tinta oscura en toda pantalla minimal --- */
+[data-theme="light"] .template-minimal,
+[data-theme="light"] .template-default,
+:root:not([data-theme="dark"]) .template-minimal,
+:root:not([data-theme="dark"]) .template-default {
+  color: #1a1a1a;
+}
+
+/* Cards blancas (login, create-first-user, forgot-password, etc.)
+   garantizan SIEMPRE tinta oscura independientemente del tema
+   del sistema — porque el fondo de la card está forzado a blanco. */
+.login__wrap,
+.template-minimal__wrap,
+.create-first-user,
+.create-first-user__wrap,
+.forgot-password,
+.forgot-password__wrap,
+.reset-password,
+.reset-password__wrap,
+.unlock,
+.verify {
+  color: #1a1a1a !important;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #1a1a1a !important;
+  }
+
+  p, span, label, .field-label, li, small, em, strong {
+    color: #2c2419 !important;
+  }
+
+  /* Texto de ayuda/descripciones más tenue pero aún legible (AA) */
+  .field-description,
+  .tooltip,
+  .help-text,
+  > p {
+    color: #555 !important;
+  }
+
+  a {
+    color: var(--brand-accent-dark) !important;
+    font-weight: 500;
+    text-decoration: underline;
+  }
+
+  a:hover {
+    color: var(--brand-accent) !important;
+  }
+
+  /* Inputs siempre con fondo blanco y tinta oscura en estas pantallas */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    border: 2px solid #ddd2c0 !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #8a7d6b !important;
+  }
+}
+
+/* --- Botón Create / Submit en pantallas minimal --- */
+.create-first-user button[type="submit"],
+.forgot-password button[type="submit"],
+.reset-password button[type="submit"],
+.template-minimal button[type="submit"],
+.template-minimal .btn--style-primary {
+  background: var(--brand-accent) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 600 !important;
+
+  &:hover {
+    background: var(--brand-accent-dark) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* --- Dropdowns/select de Role, etc.: lista desplegable legible --- */
+.rs__menu,
+.rs__option,
+.react-select__menu,
+.react-select__option,
+.popup-button-list,
+.popup-button-list__button {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+}
+
+.rs__option--is-focused,
+.rs__option:hover,
+.react-select__option--is-focused,
+.popup-button-list__button:hover {
+  background: var(--brand-soft) !important;
+  color: #1a1a1a !important;
+}
+
+.rs__option--is-selected,
+.react-select__option--is-selected {
+  background: var(--brand-accent) !important;
+  color: #ffffff !important;
+}
+
+.rs__single-value,
+.rs__input,
+.rs__input-container,
+.react-select__single-value {
+  color: #1a1a1a !important;
+}
+
+.rs__control,
+.react-select__control {
+  background: #ffffff !important;
+  border: 2px solid #ddd2c0 !important;
+
+  &:hover {
+    border-color: var(--brand-accent-light) !important;
+  }
+}
+
+/* --- Modales / drawers con fondo claro --- */
+.drawer__content,
+.modal__content,
+.dialog__content {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+
+  h1, h2, h3, h4, h5, h6, p, label, span {
+    color: #1a1a1a !important;
+  }
+}
+
+/* --- Toasts/notificaciones: contraste claro según tipo --- */
+.payload-toast-item,
+.Toastify__toast {
+  &.payload-toast--success,
+  &.Toastify__toast--success {
+    background: #e6f0df !important;
+    color: #1e3d12 !important;
+  }
+  &.payload-toast--error,
+  &.Toastify__toast--error {
+    background: #fce4e0 !important;
+    color: #5c1a12 !important;
+  }
+  &.payload-toast--info,
+  &.Toastify__toast--info {
+    background: #e8eef5 !important;
+    color: #1a2e4a !important;
+  }
+}
+
+/* --- Tema OSCURO: asegurar texto claro sobre fondos oscuros --- */
+[data-theme="dark"] {
+  .card,
+  .collection-list,
+  .dashboard__group,
+  .drawer__content,
+  .modal__content {
+    background: var(--theme-elevation-50) !important;
+    color: var(--theme-text) !important;
+
+    h1, h2, h3, h4, h5, h6, p, label, span {
+      color: var(--theme-text) !important;
+    }
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    background: var(--theme-elevation-100) !important;
+    color: var(--theme-text) !important;
+    border-color: var(--theme-elevation-200) !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #a69a85 !important;
+  }
+
+  .rs__menu,
+  .react-select__menu,
+  .popup-button-list {
+    background: var(--theme-elevation-100) !important;
+    color: var(--theme-text) !important;
+  }
+
+  .rs__option--is-focused,
+  .rs__option:hover,
+  .popup-button-list__button:hover {
+    background: var(--theme-elevation-200) !important;
+    color: #ffffff !important;
+  }
+
+  .table thead th {
+    background: var(--theme-elevation-100) !important;
+    color: var(--theme-text) !important;
+  }
+}
+
+/* --- Rich text (Lexical): contraste garantizado --- */
+.rich-text-lexical,
+.lexical-rich-text,
+[contenteditable="true"] {
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+[data-theme="dark"] .rich-text-lexical,
+[data-theme="dark"] .lexical-rich-text,
+[data-theme="dark"] [contenteditable="true"] {
+  color: var(--theme-text);
+  background: var(--theme-elevation-50);
+}
+
+/* --- Disabled/readonly: mantener legibilidad --- */
+input:disabled,
+input[readonly],
+textarea:disabled,
+textarea[readonly],
+select:disabled {
+  background: #f0eadf !important;
+  color: #5a5247 !important;
+  cursor: not-allowed;
+  opacity: 1 !important;
+}
+
+[data-theme="dark"] input:disabled,
+[data-theme="dark"] textarea:disabled,
+[data-theme="dark"] select:disabled {
+  background: var(--theme-elevation-100) !important;
+  color: #9a9082 !important;
+}
+
+/* --- Tablas con columnas y celdas siempre legibles --- */
+.table tbody td {
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .table tbody td {
+  color: var(--theme-text);
+}
+
+/* --- Tabs/pestañas --- */
+.tabs-field__tabs,
+.tabs__tab-button {
+  color: #2c2419;
+}
+
+.tabs__tab-button--active {
+  color: var(--brand-accent-dark) !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .tabs__tab-button {
+  color: var(--theme-text);
+}
+
+[data-theme="dark"] .tabs__tab-button--active {
+  color: var(--brand-accent) !important;
+}
