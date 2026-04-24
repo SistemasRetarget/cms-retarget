@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { logger } from "@/lib/logger";
+
+// Web Crypto API works in both edge and nodejs runtimes.
+// Avoid `node:crypto` to keep the middleware edge-compatible, which also
+// avoids breaking SSR streaming for routes like /admin.
+const randomUUID = () => globalThis.crypto.randomUUID();
 
 const ALLOWED_ORIGINS = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000")
   .split(",")
@@ -70,6 +74,7 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
-  runtime: "nodejs", // Edge runtime doesn't support Node.js crypto module
+  // Exclude admin + payload API from middleware to avoid interfering with
+  // Payload's SSR streaming and internal routing.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|admin|api/graphql).*)"],
 };
