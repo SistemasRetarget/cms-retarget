@@ -97,6 +97,10 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "dev-only-change-me",
   typescript: { outputFile: path.resolve(__dirname, "payload-types.ts") },
   db: postgresAdapter({
+    // Auto-sync schema on startup. Payload will create/alter tables to match
+    // the collections config. Useful for first deploys; switch to formal
+    // migrations (`payload migrate`) once the schema stabilises.
+    push: true,
     pool: {
       connectionString:
         process.env.DATABASE_URL || "postgresql://news:news@localhost:5432/news_db",
