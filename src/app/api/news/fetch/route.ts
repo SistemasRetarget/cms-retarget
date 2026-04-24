@@ -4,21 +4,14 @@ import config from "@payload-config";
 import { collect, type SourceType } from "@/lib/collectors";
 import { generateArticle, resolveConfig } from "@/lib/ai/providers";
 import { uniqueSlug } from "@/lib/slug";
+import { requireFeature } from "@/lib/features";
+import { plainTextToLexical } from "@/lib/lexical";
 
-function lexicalFromText(body: string) {
-  const paragraphs = body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  return {
-    root: {
-      type: "root", format: "", indent: 0, version: 1, direction: null,
-      children: (paragraphs.length ? paragraphs : [body]).map((text) => ({
-        type: "paragraph", version: 1,
-        children: [{ type: "text", text, version: 1 }]
-      }))
-    }
-  };
-}
 
 export async function POST(req: NextRequest) {
+  const gate = requireFeature("news") || requireFeature("ai");
+  if (gate) return gate;
+
   const payload = await getPayload({ config });
 
   // Auth: usuario logueado admin o cron secret
@@ -122,7 +115,7 @@ export async function POST(req: NextRequest) {
               title: generated.title,
               slug,
               excerpt: generated.excerpt,
-              body: lexicalFromText(generated.body),
+              body: plainTextToLexical(generated.body),
               category: categoryId as string,
               tags: generated.tags.map((tag) => ({ tag })),
               status: autoPublish ? "published" : "draft",

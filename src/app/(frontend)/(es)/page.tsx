@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { listArticles, listCategories } from "@/lib/cms";
+import { buildHomeMetadata } from "@/lib/seo/metadata";
+import { organizationSchema, websiteSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/JsonLd";
 
 export const revalidate = 60;
+
+export function generateMetadata() {
+  return buildHomeMetadata();
+}
 
 export default async function Home() {
   let articles: Array<Record<string, unknown>> = [];
@@ -13,6 +20,7 @@ export default async function Home() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
+      <JsonLd data={[websiteSchema(), organizationSchema()]} />
       <section className="mb-16">
         <h1 className="font-serif text-5xl md:text-6xl mb-4">Noticias, curadas por IA</h1>
         <p className="text-brand-muted text-lg max-w-2xl">

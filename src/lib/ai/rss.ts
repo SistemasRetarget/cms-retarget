@@ -3,6 +3,8 @@
  * Limita resultados y extrae título, link, descripción y fecha.
  */
 
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
+
 export interface RSSItem {
   title: string;
   link: string;
@@ -29,12 +31,13 @@ function pick(src: string, tag: string): string {
 }
 
 export async function fetchRSS(url: string, max = 10): Promise<RSSItem[]> {
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     headers: {
       "User-Agent": "NewsAICMS/1.0 (+https://github.com/news-ai-cms)",
       Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, */*"
     },
-    cache: "no-store"
+    cache: "no-store",
+    timeoutMs: 10_000
   });
   if (!res.ok) throw new Error(`RSS ${res.status} @ ${url}`);
   const xml = await res.text();

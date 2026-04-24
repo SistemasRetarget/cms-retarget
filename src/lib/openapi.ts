@@ -14,6 +14,8 @@ export const openApiSpec = {
     { name: "articles", description: "News article workflow" },
     { name: "trends", description: "LLM-powered trend analysis" },
     { name: "landing-pages", description: "AI-generated landing pages" },
+    { name: "analyzer", description: "Site analyzer / cloner" },
+    { name: "site", description: "Site profile metadata" },
     { name: "health", description: "Liveness and readiness" },
   ],
   components: {
@@ -181,6 +183,61 @@ export const openApiSpec = {
         summary: "Invalidate the trends cache",
         security: [{ payloadCookie: [] }],
         responses: { "200": { description: "Cache invalidated" }, "401": { description: "Not authenticated" } },
+      },
+    },
+    "/analyzer": {
+      post: {
+        tags: ["analyzer"],
+        summary: "Analyze a public URL and return a SiteBlueprint (editor/admin)",
+        security: [{ payloadCookie: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["url"],
+                properties: {
+                  url: { type: "string", format: "uri", maxLength: 2000 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Site analyzed — blueprint returned" },
+          "400": { description: "Invalid URL" },
+          "401": { description: "Not authenticated" },
+          "403": { description: "Insufficient role" },
+          "404": { description: "Feature disabled on this profile" },
+          "429": { description: "Rate limit exceeded" },
+          "500": { description: "Fetch/analyze error" },
+        },
+      },
+    },
+    "/site/profile": {
+      get: {
+        tags: ["site"],
+        summary: "Active site profile (features, branding, SEO defaults)",
+        responses: {
+          "200": {
+            description: "Profile returned",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    label: { type: "string" },
+                    features: { type: "object", additionalProperties: { type: "boolean" } },
+                    branding: { type: "object", additionalProperties: true },
+                    seo: { type: "object", additionalProperties: true },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     },
     "/landing-pages/generate": {

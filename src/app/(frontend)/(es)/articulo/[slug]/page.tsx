@@ -1,28 +1,42 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getArticle, renderLexical } from "@/lib/cms";
+import { buildArticleMetadata } from "@/lib/seo/metadata";
+import { articleSchema, breadcrumbSchema, organizationSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/JsonLd";
+import type { SeoArticle } from "@/lib/seo/types";
 
 export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const a = await getArticle(slug, "es") as (Record<string, unknown> & { title?: string; excerpt?: string; meta?: { title?: string; description?: string } }) | null;
+  const a = (await getArticle(slug, "es")) as SeoArticle | null;
   if (!a) return { title: "Artículo" };
-  return {
-    title: a.meta?.title || a.title,
-    description: a.meta?.description || a.excerpt
-  };
+  return buildArticleMetadata(a);
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const a = await getArticle(slug, "es") as (Record<string, unknown> & { title?: string; excerpt?: string; body?: unknown; publishedAt?: string; sourceUrl?: string; category?: { slug?: string; name?: string }; coverImage?: { url?: string } }) | null;
+  const a = (await getArticle(slug, "es")) as (SeoArticle & { body?: unknown }) | null;
   if (!a) notFound();
 
   const html = renderLexical(a.body);
 
+  const schema = [
+    articleSchema(a),
+    breadcrumbSchema([
+      { label: "Inicio", href: "/" },
+      ...(a.category?.slug && a.category.name
+        ? [{ label: a.category.name, href: `/categoria/${a.category.slug}` }]
+        : []),
+      { label: a.title, href: `/articulo/${a.slug}` },
+    ]),
+    organizationSchema(),
+  ];
+
   return (
     <article className="max-w-3xl mx-auto px-6 py-12">
+      <JsonLd data={schema} />
       {a.category?.name && (
         <Link href={`/categoria/${a.category.slug}`} className="text-sm uppercase tracking-wide text-brand-accent font-semibold">
           {a.category.name}

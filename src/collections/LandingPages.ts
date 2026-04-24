@@ -1,4 +1,5 @@
 import type { CollectionConfig } from "payload";
+import { seoFields } from "./fields/seoFields";
 
 const HeroBlock = {
   slug: "hero",
@@ -175,14 +176,6 @@ export const LandingPages: CollectionConfig = {
       label: "Generada con IA",
       admin: { position: "sidebar" }
     },
-    {
-      name: "meta",
-      type: "group",
-      label: "SEO",
-      fields: [
-        { name: "title", type: "text", label: "Meta título" },
-        { name: "description", type: "textarea", label: "Meta descripción" }
-      ]
-    }
+    seoFields
   ]
 };

@@ -6,8 +6,12 @@ import { generateLandingPageSchema } from "@/lib/schemas";
 import { createRequestLogger } from "@/lib/logger";
 import { rateLimit } from "@/lib/rateLimit";
 import { uniqueSlug } from "@/lib/slug";
+import { requireFeature } from "@/lib/features";
 
 export async function POST(req: NextRequest) {
+  const gate = requireFeature("landingPages") || requireFeature("ai");
+  if (gate) return gate;
+
   const requestId = req.headers.get("x-request-id") || "unknown";
   const log = createRequestLogger(requestId);
 

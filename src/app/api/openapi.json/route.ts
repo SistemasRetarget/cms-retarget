@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { jsonWithETag } from "@/lib/etag";
 import { openApiSpec } from "@/lib/openapi";
 
-export function GET() {
-  return NextResponse.json(openApiSpec, {
-    headers: { "Cache-Control": "public, max-age=3600" },
+export function GET(req: Request) {
+  return jsonWithETag(req, openApiSpec, {
+    maxAge: 3600,
+    sMaxAge: 86400,
+    staleWhileRevalidate: 86400,
   });
 }

@@ -41,3 +41,14 @@ export const generateLandingPageSchema = z.object({
 });
 
 export type GenerateLandingPageRequest = z.infer<typeof generateLandingPageSchema>;
+
+// Site analyzer request
+export const analyzeSiteSchema = z.object({
+  url: z
+    .string()
+    .url("Invalid URL")
+    .max(2000, "URL too long")
+    .refine((u) => /^https?:\/\//i.test(u), "URL must use http(s)"),
+});
+
+export type AnalyzeSiteRequest = z.infer<typeof analyzeSiteSchema>;

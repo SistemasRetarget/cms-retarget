@@ -20,11 +20,13 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 ENV NODE_ENV=production
+# Default PORT for local `docker run`. Platforms like Railway/Fly inject their
+# own $PORT and `next start` honours it automatically (no -p flag in npm start).
 ENV PORT=3000
 
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000', (r) => { if (r.statusCode >= 500) process.exit(1); }).on('error', () => process.exit(1));"
+  CMD node -e "const p=process.env.PORT||3000;require('http').get('http://localhost:'+p,(r)=>{if(r.statusCode>=500)process.exit(1);}).on('error',()=>process.exit(1));"
 
 CMD ["npm", "start"]

@@ -5,6 +5,7 @@
 
 import * as cheerio from "cheerio";
 import type { CollectedItem } from "./types";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 const UA = "Mozilla/5.0 (compatible; NewsAICMS/1.0; +https://github.com/news-ai-cms)";
 
@@ -33,9 +34,9 @@ const REMOVE_SELECTORS = [
 export async function scrapeHTML(url: string): Promise<CollectedItem | null> {
   let html: string;
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: { "User-Agent": UA, "Accept": "text/html,*/*" },
-      signal: AbortSignal.timeout(15000)
+      timeoutMs: 15_000
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     html = await res.text();

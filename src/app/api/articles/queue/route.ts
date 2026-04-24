@@ -3,8 +3,12 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { createRequestLogger } from "@/lib/logger";
 import { articleQueueQuerySchema } from "@/lib/schemas";
+import { requireFeature } from "@/lib/features";
 
 export async function GET(req: NextRequest) {
+  const gate = requireFeature("news");
+  if (gate) return gate;
+
   const requestId = req.headers.get("x-request-id") || "unknown";
   const log = createRequestLogger(requestId);
 

@@ -6,6 +6,7 @@
 
 import { scrapeHTML } from "./html";
 import type { CollectedItem } from "./types";
+import { fetchWithTimeout } from "@/lib/fetchWithTimeout";
 
 const UA = "Mozilla/5.0 (compatible; NewsAICMS/1.0)";
 
@@ -32,9 +33,9 @@ function pick(xml: string, tag: string): string {
 }
 
 async function fetchXML(url: string): Promise<string> {
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     headers: { "User-Agent": UA, Accept: "application/xml,text/xml,*/*" },
-    signal: AbortSignal.timeout(15000)
+    timeoutMs: 15_000
   });
   if (!res.ok) throw new Error(`Sitemap HTTP ${res.status} @ ${url}`);
   return res.text();

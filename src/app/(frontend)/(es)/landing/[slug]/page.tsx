@@ -6,6 +6,10 @@ import type {
   HeroSection, FeaturesSection, CTASection,
   TestimonialsSection, FAQSection, StatsSection, LandingSection
 } from "@/lib/ai/landing";
+import { buildLandingMetadata } from "@/lib/seo/metadata";
+import { webPageSchema, organizationSchema, faqSchema, breadcrumbSchema } from "@/lib/seo/schema";
+import { JsonLd } from "@/components/JsonLd";
+import type { SeoLanding } from "@/lib/seo/types";
 
 export const revalidate = 60;
 
@@ -23,11 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const landing = await getLanding(slug);
   if (!landing) return { title: "No encontrado" };
-  const meta = landing.meta as { title?: string; description?: string } | undefined;
-  return {
-    title: meta?.title || String(landing.title),
-    description: meta?.description || ""
-  };
+  return buildLandingMetadata(landing as unknown as SeoLanding);
 }
 
 // ── Bloques ─────────────────────────────────────────────────────────
@@ -223,8 +223,29 @@ export default async function LandingPage({ params }: { params: Promise<{ slug: 
   const sections = (landing.sections || []) as LandingSection[];
   const primaryColor = (landing.primaryColor as string) || "#8b7355";
 
+  // Harvest FAQ content so Google shows rich FAQ snippets when present.
+  const faqItems: Array<{ question: string; answer: string }> = [];
+  for (const s of sections) {
+    if (s.blockType === "faq" && Array.isArray(s.items)) {
+      for (const it of s.items) {
+        if (it.question && it.answer) faqItems.push({ question: it.question, answer: it.answer });
+      }
+    }
+  }
+
+  const schema: Array<Record<string, unknown>> = [
+    webPageSchema(landing as unknown as SeoLanding),
+    organizationSchema(),
+    breadcrumbSchema([
+      { label: "Inicio", href: "/" },
+      { label: String(landing.title), href: `/landing/${slug}` },
+    ]),
+  ];
+  if (faqItems.length > 0) schema.push(faqSchema(faqItems));
+
   return (
     <main>
+      <JsonLd data={schema} />
       {sections.map((section, i) => (
         <RenderSection key={i} section={section} primaryColor={primaryColor} />
       ))}

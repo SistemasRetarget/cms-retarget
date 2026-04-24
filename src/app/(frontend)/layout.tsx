@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { WebVitals } from "@/components/WebVitals";
 
 export const metadata: Metadata = {
   title: { default: "News AI · Blog de noticias con IA", template: "%s · News AI" },
@@ -11,6 +12,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
   return (
     <>
       <GoogleAnalytics />
+      <WebVitals />
       {children}
     </>
   );

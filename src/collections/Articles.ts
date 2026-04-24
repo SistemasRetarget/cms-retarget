@@ -1,11 +1,34 @@
 import type { CollectionConfig } from "payload";
+import { seoFields } from "./fields/seoFields";
+import { getActiveProfile } from "../site-profiles";
+
+// Feature-gated view override. When `inlineEditor` is enabled, clicking an
+// article in the admin list opens our streamlined `default` view (title,
+// slug, body-as-plain-text, SEO group) instead of Payload's full edit form.
+// The other document tabs — API, versions, live preview — stay intact, so
+// the rich Lexical editor and version diff remain a click away.
+const profile = getActiveProfile();
+const editViewOverride = profile.features.inlineEditor
+  ? {
+      components: {
+        views: {
+          edit: {
+            default: {
+              Component: "@/components/admin/InlineArticleEditor#default",
+            },
+          },
+        },
+      },
+    }
+  : {};
 
 export const Articles: CollectionConfig = {
   slug: "articles",
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "category", "status", "publishedAt", "source"],
-    group: "Noticias"
+    group: "Noticias",
+    ...editViewOverride,
   },
   access: { read: () => true },
   versions: { drafts: true },
@@ -82,14 +105,6 @@ export const Articles: CollectionConfig = {
       ]
     },
     { name: "aiModel", type: "text", admin: { readOnly: true, position: "sidebar" } },
-    {
-      name: "meta",
-      type: "group",
-      localized: true,
-      fields: [
-        { name: "title", type: "text", maxLength: 80 },
-        { name: "description", type: "textarea", maxLength: 200 }
-      ]
-    }
+    seoFields
   ]
 };

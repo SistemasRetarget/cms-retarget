@@ -7,12 +7,16 @@ import { resolveConfig } from "@/lib/ai/providers";
 import { trendsQuerySchema } from "@/lib/schemas";
 import { createRequestLogger } from "@/lib/logger";
 import { rateLimit } from "@/lib/rateLimit";
+import { requireFeature } from "@/lib/features";
 
 function windowToMs(w: "24h" | "48h"): number {
   return w === "48h" ? 48 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
 }
 
 export async function GET(req: NextRequest) {
+  const gate = requireFeature("trends");
+  if (gate) return gate;
+
   const requestId = req.headers.get("x-request-id") || "unknown";
   const log = createRequestLogger(requestId);
 
@@ -117,6 +121,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const gate = requireFeature("trends");
+  if (gate) return gate;
+
   const requestId = req.headers.get("x-request-id") || "unknown";
   const log = createRequestLogger(requestId);
 
