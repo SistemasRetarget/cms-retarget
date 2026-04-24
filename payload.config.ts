@@ -1,6 +1,7 @@
 import { buildConfig } from "payload";
 import type { CollectionConfig, GlobalConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { pushDevSchema } from "@payloadcms/drizzle";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -76,6 +77,25 @@ if (features.news && adminViews) {
 }
 
 export default buildConfig({
+  // First-deploy bootstrap: `@payloadcms/db-postgres` only runs `pushDevSchema`
+  // when NODE_ENV !== 'production', so a brand-new managed Postgres on
+  // Railway/Render never gets its tables created at runtime. When
+  // `PAYLOAD_FORCE_PUSH=true` is set, we force the push here on Payload init
+  // so the schema is materialised before the first HTTP request lands.
+  // Remove/disable after the schema stabilises and you've switched to formal
+  // `payload migrate` migrations.
+  onInit: async (payload) => {
+    if (process.env.PAYLOAD_FORCE_PUSH === "true") {
+      try {
+        payload.logger.info("PAYLOAD_FORCE_PUSH=true — pushing drizzle schema to Postgres…");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await pushDevSchema(payload.db as any);
+        payload.logger.info("Schema push completed.");
+      } catch (err) {
+        payload.logger.error({ err }, "Forced schema push failed");
+      }
+    }
+  },
   admin: {
     user: Users.slug,
     meta: {
