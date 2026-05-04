@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-const API_BASE = 'http://localhost:3000/api';
-const ADMIN_URL = 'http://localhost:3000/admin';
+const API_BASE = process.env.PW_API_BASE || 'http://localhost:3000/api';
+const ADMIN_URL = process.env.PW_ADMIN_URL || 'http://localhost:3000/admin';
 
 test.describe('Articles Collection', () => {
   // Article CRUD tests

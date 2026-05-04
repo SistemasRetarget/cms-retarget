@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = process.env.PW_API_BASE || 'http://localhost:3000/api';
 
 test.describe('Categories Collection', () => {
   test('1. Create category with name', async ({ request }) => {
