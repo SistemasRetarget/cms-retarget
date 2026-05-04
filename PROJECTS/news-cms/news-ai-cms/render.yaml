@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: puebloladehesa
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: DATABASE_URI
+        fromDatabase:
+          name: puebloladehesa-db
+          property: connectionString
+      - key: PAYLOAD_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_GA_ID
+        sync: false
+      - key: NEXT_PUBLIC_GTM_ID
+        sync: false
+      - key: NEXT_PUBLIC_WHATSAPP_NUMBER
+        sync: false
+      - key: NODE_ENV
+        value: production
+
+databases:
+  - name: puebloladehesa-db
+    plan: free
+    postgresMajorVersion: 16
